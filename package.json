@@ -1,0 +1,66 @@
+{
+  "name": "@uocazizah/blazing-node",
+  "version": "1.0.0",
+  "description": "A lightweight, general-purpose npm package for enterprise users",
+  "type": "module",
+  "author": "Uoc Azizah",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ustdb/blazing-node.git"
+  },
+  "homepage": "https://github.com/ustdb/blazing-node#readme",
+  "bugs": {
+    "url": "https://github.com/ustdb/blazing-node/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./io": {
+      "import": {
+        "types": "./dist/esm/io/index.d.ts",
+        "default": "./dist/esm/io/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/io/index.d.ts",
+        "default": "./dist/cjs/io/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "check": "biome check . && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.10",
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}
