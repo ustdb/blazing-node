@@ -51,8 +51,14 @@
   ],
   "scripts": {
     "build:cjs": "tsc --project tsconfig.cjs.json",
+    "rename:cjs": "find dist/cjs -type f -name '*.js' -exec sh -c 'for file do mv -- \"$file\" \"${file%.js}.cjs\"; done' sh {} +",
     "build:esm": "tsc --project tsconfig.esm.json",
     "build": "npm run build:cjs && npm run build:esm",
+    "clean": "rm -drf dist build",
+    "native:configure": "node-gyp configure",
+    "native:build": "node scripts/native_build.mjs",
+    "native:rebuild": "node-gyp rebuild",
+    "build:native": "node-gyp rebuild",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "format": "biome format --write .",
@@ -61,6 +67,9 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.10",
     "@types/node": "^26.2.0",
+    "cmake-js": "^8.0.0",
+    "node-addon-api": "^8.9.2",
+    "node-gyp": "^13.0.1",
     "typescript": "^7.0.2"
   }
 }
