@@ -4,5 +4,14 @@
     "module": "CommonJS",
     "outDir": "./dist/cjs",
     "rootDir": "./src"
-  }
+  },
+  "include": [
+    "src/**/*.cts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "native-bin",
+    "dist"
+  ]
 }

@@ -4,5 +4,14 @@
     "module": "ESNext",
     "outDir": "./dist/esm",
     "rootDir": "./src"
-  }
+  },
+  "include": [
+    "src/**/*.mts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "native-bin",
+    "dist"
+  ]
 }

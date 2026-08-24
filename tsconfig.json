@@ -15,6 +15,7 @@
     "sourceMap": true,
 
     "noUncheckedSideEffectImports": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   }
 }
