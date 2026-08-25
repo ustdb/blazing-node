@@ -3,40 +3,32 @@ import { existsSync, mkdirSync, renameSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { arch, platform } from 'node:process';
 
-const target = `${platform}-${arch}`;
+// Map Node.js arch names to GNU triplet
+function getTargetDir() {
+    if (platform !== 'linux') {
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+    switch (arch) {
+        case 'arm64': return 'aarch64-linux-gnu';
+        case 'x64':   return 'x86_64-linux-gnu';
+        default:      throw new Error(`Unsupported architecture: ${arch}`);
+    }
+}
 
-const source = join(
-  'build',
-  'Release',
-  'blazing_node.node'
-);
+const target = getTargetDir();
 
-const destination = join(
-  'native-bin',
-  target,
-  'blazing_node.node'
-);
+const source = join('build', 'Release', 'blazing_node.node');
+const destination = join('native-bin', target, 'blazing_node.node');
 
 console.log(`Building native addon for ${target}`);
 
-execFileSync(
-  'cmake-js',
-  ['rebuild', '--config', 'Release'],
-  {
-    stdio: 'inherit'
-  }
-);
+execFileSync('cmake-js', ['rebuild', '--config', 'Release'], { stdio: 'inherit' });
 
 if (!existsSync(source)) {
-  throw new Error(
-    `CMake.js completed, but native addon was not found: ${source}`
-  );
+    throw new Error(`CMake.js completed, but native addon not found: ${source}`);
 }
 
-mkdirSync(dirname(destination), {
-  recursive: true
-});
-
+mkdirSync(dirname(destination), { recursive: true });
 renameSync(source, destination);
 
 console.log(`Native addon copied to: ${destination}`);
