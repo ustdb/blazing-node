@@ -6,20 +6,11 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <variant>
-#include <format>
 #include <regex>
-#include <algorithm>
+#include <format>
+#include <cmath>
 
 namespace blazing::io::printf {
-
-// Helper to format a single value using std::format with an optional specifier
-template<typename T>
-std::string format_value(const T& value, std::string_view spec = "{}") {
-    // spec is like "{}", "{:d}", "{:.2f}" etc.
-    return std::format(spec, value);
-}
 
 Napi::Value Printf(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
@@ -33,67 +24,56 @@ Napi::Value Printf(const Napi::CallbackInfo& info) {
     std::string fmt_str = info[0].As<Napi::String>().Utf8Value();
     std::string result;
 
-    // Use regex to find placeholders: {} or {:[^}]*}
-    // We'll process sequentially, matching with arguments.
     std::regex placeholder(R"(\{([^}]*)\})");
     std::smatch match;
     std::string::const_iterator search_start(fmt_str.cbegin());
-    size_t arg_index = 1;  // first argument is format string
-
-    // We'll collect the output parts
-    auto append_literal = [&](const std::string& literal) {
-        result += literal;
-    };
+    size_t arg_index = 1;
 
     try {
         while (std::regex_search(search_start, fmt_str.cend(), match, placeholder)) {
-            // Append literal before the placeholder
+            // Append literal before placeholder
             result.append(match.prefix().first, match.prefix().second);
 
-            // Get the specifier inside the braces (e.g., ":d", ".2f" etc.)
-            std::string spec = match[1].str();
-            std::string full_placeholder = match[0].str();
+            std::string full_placeholder = match[0].str(); // e.g. "{:.2f}"
 
-            // Check if we have a corresponding argument
             if (arg_index >= info.Length()) {
-                // Not enough arguments, leave placeholder as is
+                // Not enough arguments → keep placeholder as‑is
                 result += full_placeholder;
             } else {
                 Napi::Value arg = info[arg_index++];
-
-                // Format the value according to its type and the specifier
                 std::string formatted;
+
                 if (arg.IsNumber()) {
                     double val = arg.As<Napi::Number>().DoubleValue();
-                    // Check if integer to avoid ".0"
-                    if (val == static_cast<int64_t>(val)) {
-                        formatted = format_value(static_cast<int64_t>(val), full_placeholder);
+                    // Detect if it's an integer (safe for int64)
+                    if (std::floor(val) == val &&
+                        val <= 9007199254740991 && val >= -9007199254740991) {
+                        int64_t i = static_cast<int64_t>(val);
+                        formatted = std::vformat(full_placeholder, std::make_format_args(i));
                     } else {
-                        formatted = format_value(val, full_placeholder);
+                        formatted = std::vformat(full_placeholder, std::make_format_args(val));
                     }
                 } else if (arg.IsString()) {
                     std::string str = arg.As<Napi::String>().Utf8Value();
-                    formatted = format_value(str, full_placeholder);
+                    formatted = std::vformat(full_placeholder, std::make_format_args(str));
                 } else if (arg.IsBoolean()) {
                     bool b = arg.As<Napi::Boolean>().Value();
-                    formatted = format_value(b, full_placeholder);
+                    formatted = std::vformat(full_placeholder, std::make_format_args(b));
                 } else {
-                    // Non‑primitive: convert to string representation
-                    formatted = format_value("[Object]", full_placeholder);
+                    // Non‑primitive → show as "[Object]"
+                    formatted = std::vformat(full_placeholder, std::make_format_args("[Object]"));
                 }
+
                 result += formatted;
             }
 
-            // Continue after the placeholder
             search_start = match.suffix().first;
         }
 
-        // Append the remaining literal after the last placeholder
+        // Append the tail after the last placeholder
         result.append(search_start, fmt_str.cend());
 
-        // Output to stdout (like console.log)
         std::cout << result;
-
         return Napi::String::New(env, result);
 
     } catch (const std::exception& e) {

@@ -2,6 +2,7 @@ import { join } from "node:path";
 
 export interface NativeAPI {
     hello(): string;
+    printf(format: string, ...args: any[]): string;
 }
 
 function getNativeBinary(): string {

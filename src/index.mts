@@ -1,1 +1,1 @@
-export { hello } from "./io/print.mjs";
+export { printf } from "./io/printf.mjs";

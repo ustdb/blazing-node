@@ -1,3 +1,3 @@
-import { hello } from './dist/esm/index.mjs';
+import { printf } from './dist/esm/index.mjs';
 
-console.log(hello());
+printf("hello world!\n");

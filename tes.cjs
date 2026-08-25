@@ -1,3 +1,3 @@
-const { hello } = require("./dist/cjs/index.cjs");
+const { printf } = require("./dist/cjs/index.cjs");
 
-console.log(hello());
+printf("hello world\n");

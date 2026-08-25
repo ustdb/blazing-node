@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 export interface NativeAPI {
     hello(): string;
+    printf(format: string, ...args: any[]): string;
 }
 
 const nativeRequire = createRequire(import.meta.url);
