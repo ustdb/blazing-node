@@ -1,3 +1,3 @@
-const addon = require("./build/Release/blazing_node.node");
+const { hello } = require("./dist/cjs/index.cjs");
 
-console.log(addon.hello());
+console.log(hello());

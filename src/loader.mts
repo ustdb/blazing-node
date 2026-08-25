@@ -17,6 +17,7 @@ function getNativeBinary(): string {
         return join(
             __dirname,
             "..",
+            "..",
             "native-bin",
             "linux-arm64",
             "blazing_node.node",

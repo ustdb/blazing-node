@@ -2,21 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 
 project(blazing_node LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
-# --------------------------------------------------
-# Node.js headers
-# --------------------------------------------------
 
 message(STATUS
     "Node.js include: ${CMAKE_JS_INC}"
 )
 
-# --------------------------------------------------
-# node-addon-api
-# --------------------------------------------------
 
 execute_process(
     COMMAND
@@ -43,12 +37,10 @@ message(STATUS
     "node-addon-api include: ${NODE_ADDON_API_INCLUDE}"
 )
 
-# --------------------------------------------------
-# Native addon
-# --------------------------------------------------
 
 add_library(${PROJECT_NAME} SHARED
     native/src/addon.cxx
+    native/src/io/printf.cxx
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -59,13 +51,15 @@ set_target_properties(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+)
+
+target_include_directories(${PROJECT_NAME}
+    SYSTEM PRIVATE
         ${CMAKE_JS_INC}
         ${NODE_ADDON_API_INCLUDE}
 )
 
-# --------------------------------------------------
-# Node-API C++ exceptions
-# --------------------------------------------------
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
@@ -86,7 +80,54 @@ else()
         PRIVATE
             -Wall
             -Wextra
+
+            -Wpedantic
+            -Wconversion
+            -Wsign-conversion
+            -Wshadow
+            -Wold-style-cast
+            -Wcast-align
+            -Wcast-qual
+            -Wpointer-arith
+            -Wwrite-strings
+
+            -Wformat=2
+            -Wundef
+            -Wuninitialized
+            -Wmaybe-uninitialized
+            -Winit-self
+            -Wswitch
+            -Wswitch-enum
+            -Wimplicit-fallthrough
+            -Wduplicated-cond
+            -Wduplicated-branches
+            -Wlogical-op
+
+            -Wmissing-declarations
+#            -Wmissing-prototypes
+#            -Wstrict-prototypes
+#            -Wold-style-definition
+
+            -Wnon-virtual-dtor
+            -Woverloaded-virtual
+            -Wuseless-cast
+            -Wzero-as-null-pointer-constant
+
+            -Wpointer-arith
+            -Warray-bounds
+            -Wstringop-overflow
+            -Wstringop-overread
+
+            -Wdouble-promotion
+            -Wfloat-equal
+            -Wmissing-field-initializers
+            -Wredundant-decls
+            -Wdeprecated
+            -Wdeprecated-declarations
+
+            -Wexceptions
             -fexceptions
+            -O2
     )
 
 endif()

@@ -1,20 +1,12 @@
+/*
+ * SPDX-License-Identifier: MIT
+ */
+
 #include <napi.h>
+#include <io/printf.hxx>
 
-Napi::Value Hello(const Napi::CallbackInfo& info)
-{
-    Napi::Env env = info.Env();
-
-    return Napi::String::New(env, "Hello from C++!");
-}
-
-Napi::Object Init(Napi::Env env, Napi::Object exports)
-{
-    exports.Set(
-        "hello",
-        Napi::Function::New(env, Hello)
-    );
-
+NAPI_MODULE_INIT() {
+    Napi::Object exports_obj(env, exports);  // wrap raw napi_value
+    blazing::io::printf::Init(env, exports_obj);
     return exports;
 }
-
-NODE_API_MODULE(blazing_node, Init)
