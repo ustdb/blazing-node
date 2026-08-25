@@ -1,0 +1,47 @@
+name: Native Package Test - Arch Linux
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-arch:
+    name: Arch Linux / Node.js Latest / GCC
+    runs-on: ubuntu-latest
+
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Install toolchain & Update
+        run: |
+          pacman -Syu --noconfirm \
+            git \
+            base-devel \
+            gcc \
+            gcc-libs \
+            nodejs \
+            npm \
+            python \
+            cmake \
+            pkgconf
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Build package
+        run: |
+          npm run build
+
+      - name: Run tests
+        run: |
+          node tes.cjs && node tes.mjs
+
+      - name: Test package
+        run: |
+          npm pack --dry-run
